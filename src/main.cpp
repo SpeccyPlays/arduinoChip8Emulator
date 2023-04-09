@@ -31,7 +31,6 @@ class CPU {
     uint16_t instruction = RAM[pc] << 8;
     instruction = instruction || RAM[pc + 1];
     pc +=2;
-
     return instruction;
   }
   void execute(uint16_t fetchedValue){
@@ -48,32 +47,58 @@ class CPU {
             //clears screen
             break;
           case 0x00EE: //RET
-            //return from subroutine
+            //set program counter to value at top of stack then decrement stack pointer
+            pc = stack[sp];
+            sp--;
             break;
         }
       case 0x1000: //JP addr
+        //set program counter to the value of lowest 12 bits of instruction (addr)
+        pc = addr;
         break;
       case 0x2000: //call addr
+        //increment stack pointer, put current program counter on top of stack. PC set to addr
+        sp ++;
+        stack[sp] = pc;
+        pc = addr;
         break;
       case 0x3000: //SE Vx, byte - Skip next instruction if Vx = kk
+        //if value in register x = kk then increment program counter
+        if (v[x] == kk){
+          pc += 2;
+        }
         break;
       case 0x4000: //SNE Vx, byte - Skip next instruction if Vx != kk
+        //if value in register x != kk then increment program counter
+        if (v[x] != kk){
+          pc += 2;
+        }
         break;
       case 0x5000: //SE Vx, Vy - Skip next instruction if Vx = Vy
+        //if value in register x = value in register y increment program counter
+        if (v[x] == v[y]){
+          pc += 2;
+        }
         break;
       case 0x6000: //LD Vx, byte - Set Vx = kk
+        v[x] = kk;
         break;
       case 0x7000: //7xkk - ADD Vx, byte Set Vx = Vx + kk
+        v[x] = v[x] + kk;
         break;
       case 0x8000:
-        switch(n){ //think we decide based on lowest 4 bits
+        switch(n){ //we decide based on lowest 4 bits
           case 0x0: //LD Vx, Vy - Set Vx = Vy
+            v[x] = v[y];
             break;
           case 0x1: //OR Vx, Vy - Set Vx = Vx OR Vy
+            v[x] = v[x] | v[y];
             break;
           case 0x2: //AND Vx, Vy - Set Vx = Vx AND Vy
+            v[x] = v[x] & v[y];
             break;
           case 0x3: //XOR Vx, Vy - Set Vx = Vx XOR Vy
+            v[x] = v[x] ^ v[y];
             break;
           case 0x4: //ADD Vx, Vy - Set Vx = Vx + Vy, set VF = carry
             break;
@@ -88,10 +113,15 @@ class CPU {
         }
         break;
       case 0x9000: //SNE Vx, Vy - Skip next instruction if Vx != Vy
+        if (v[x] != v[y]){
+          pc += 2;
+        }
         break;
       case 0xA000: //LD I, addr - Set I = nnn
+        I = addr;
         break;
       case 0xB000: //JP V0, addr - Jump to location nnn + V0
+        pc = addr + v[0];
         break;
       case 0xC000: //RND Vx, byte - Set Vx = random byte AND kk
         break;
@@ -108,14 +138,18 @@ class CPU {
       case 0xF000:
         switch (kk) {
           case 0x07: //LD Vx, DT - Set Vx = delay timer value
+            v[x] = delayTimer;
             break;
           case 0x0A: //LD Vx, K - Wait for a key press, store the value of the key in Vx
             break;
           case 0x15: //LD DT, Vx - Set delay timer = Vx
+            delayTimer = v[x];
             break;
           case 0x18: //LD ST, Vx - Set sound timer = Vx
+            soundTimer = v[x];
             break;
           case 0x1E: //ADD I, Vx - Set I = I + Vx
+            I = I + v[x];
             break;
           case 0x29: //LD F, Vx - Set I = location of sprite for digit Vx
             break;
