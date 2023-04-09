@@ -14,7 +14,7 @@ class CPU {
   uint8_t soundTimer; //functions the same as delay timers but beeps always unless 0
   uint16_t cycleCounter; //
   float refreshRate = 16.67;
-  uint8_t V0, V1, V2, V3, V4, V5, V6, V7, V8, V9 ,VA, VB, VC, VD, VE; //general purpose variable registers 
+  uint8_t v[16]; //V0, V1, V2, V3, V4, V5, V6, V7, V8, V9 ,VA, VB, VC, VD, VE; general purpose variable registers 
   uint8_t VF; //general purpose but also used as a flag register
   //the memory
   uint8_t RAM[4096]; //putting here for the moment
