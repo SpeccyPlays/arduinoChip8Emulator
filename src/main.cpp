@@ -98,7 +98,7 @@ class CPU {
       case 0xD000: //DRW Vx, Vy, nibble - Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
         break;
       case 0xE000:
-        switch(kk){
+        switch(kk){ //decide based on lowest byte
           case 0x9E: //SKP Vx - Skip next instruction if key with the value of Vx is pressed
             break;
           case 0x91: //SKNP Vx - Skip next instruction if key with the value of Vx is not pressed
